@@ -1,0 +1,19 @@
+{
+    "name": "ali-eltaweel/codecs",
+    "version": "0.0.0",
+    "description": "A collection of codecs for encoding and decoding data in various formats.",
+    "maintainers": [
+        {
+            "name": "Ali M. Kamel",
+            "email": "ali.kamel.dev@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Codecs\\": "src/"
+        }
+    }
+}
