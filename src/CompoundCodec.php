@@ -2,17 +2,19 @@
 
 namespace Codecs;
 
+use Logger\Logger;
+
 /**
  * A compound codec that combines multiple codecs into a single one.
  * 
  * @api
  * @final
  * @since 1.0.0
- * @version 1.0.0
+ * @version 1.1.0
  * @package codecs
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
-final class CompoundCodec implements ICodec {
+final class CompoundCodec extends Codec {
 
     /**
      * The codecs that make up this compound codec.
@@ -38,39 +40,26 @@ final class CompoundCodec implements ICodec {
 
         $this->codecs = [ $codec, ...$codecs ];
     }
-    
+
     /**
-     * Encodes a value into a string representation.
+     * Sets the logger to be used by this codec and its child codecs.
      * 
      * @api
      * @final
-     * @override
-     * @since 1.0.0
+     * @since 1.1.0
      * @version 1.0.0
      * 
-     * @param mixed $value
-     * @return string
+     * @param Logger|null $logger
+     * @return void
      */
-    public final function encode(mixed $value): string {
+    public final function setLogger(?Logger $logger): void {
 
-        return array_reduce($this->codecs, fn(mixed $_value, ICodec $codec) => $codec->encode($_value), $value);
-    }
+        parent::setLogger($logger);
 
-    /**
-     * Decodes a string representation back into its original value.
-     * 
-     * @api
-     * @final
-     * @override
-     * @since 1.0.0
-     * @version 1.0.0
-     * 
-     * @param string $code
-     * @return mixed
-     */
-    public final function decode(string $code): mixed {
-
-        return array_reduce(array_reverse($this->codecs), fn(string $_code, ICodec $codec) => $codec->decode($_code), $code);
+        foreach ($this->codecs as $codec) {
+            
+            $codec->setLogger($logger);
+        }
     }
 
     /**
@@ -79,7 +68,7 @@ final class CompoundCodec implements ICodec {
      * @api
      * @final
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param ICodec $codec
      * @return CompoundCodec This instance for method chaining.
@@ -87,6 +76,8 @@ final class CompoundCodec implements ICodec {
     public final function append(ICodec $codec): static {
 
         array_push($this->codecs, $codec);
+
+        $codec->setLogger($this->logger);
 
         return $this;
     }
@@ -97,7 +88,7 @@ final class CompoundCodec implements ICodec {
      * @api
      * @final
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param ICodec $codec
      * @return CompoundCodec This instance for method chaining.
@@ -106,6 +97,42 @@ final class CompoundCodec implements ICodec {
 
         array_unshift($this->codecs, $codec);
 
+        $codec->setLogger($this->logger);
+
         return $this;
+    }
+    
+    /**
+     * Encodes a value into a string representation.
+     * 
+     * @final
+     * @internal
+     * @override
+     * @since 1.1.0
+     * @version 1.0.0
+     * 
+     * @param mixed $value
+     * @return string
+     */
+    protected final function doEncode(mixed $value): string {
+
+        return array_reduce($this->codecs, fn(mixed $_value, ICodec $codec) => $codec->encode($_value), $value);
+    }
+
+    /**
+     * Decodes a string representation back into its original value.
+     * 
+     * @final
+     * @internal
+     * @override
+     * @since 1.1.0
+     * @version 1.0.0
+     * 
+     * @param string $code
+     * @return mixed
+     */
+    protected final function doDecode(string $code): mixed {
+
+        return array_reduce(array_reverse($this->codecs), fn(string $_code, ICodec $codec) => $codec->decode($_code), $code);
     }
 }

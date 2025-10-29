@@ -2,15 +2,17 @@
 
 namespace Codecs;
 
+use Logger\IHasLogger;
+
 /**
  * @api
  * @interface
  * @since 1.0.0
- * @version 1.0.0
+ * @version 1.1.0
  * @package codecs
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
-interface ICodec {
+interface ICodec extends IHasLogger {
 
     /**
      * Encodes a value into a string representation.
