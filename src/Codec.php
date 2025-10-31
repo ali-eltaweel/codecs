@@ -8,7 +8,7 @@ use Logger\{ EmitsLogs, Logger };
  * @api
  * @abstract
  * @since 1.1.0
- * @version 1.0.0
+ * @version 1.1.0
  * @package codecs
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
@@ -48,7 +48,7 @@ abstract class Codec implements ICodec {
      * @final
      * @override
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param mixed $value
      * @return string
@@ -57,11 +57,20 @@ abstract class Codec implements ICodec {
 
         $logUnit = static::class . '::' . __FUNCTION__;
 
-        $this->debugLog('pre-encode', [ 'type' => ($type = gettype($value)) === 'object' ? get_class($value) : $type ], $logUnit);
+        $this->infoLog(fn () => [
+            'Encoding value' => [
+                'type' => ($type = gettype($value)) === 'object' ? get_class($value) : $type
+            ]
+        ], $logUnit);
 
         $code = $this->doEncode($value);
 
-        $this->debugLog('post-encode', [ 'length' => (function_exists('mb_strlen') ? mb_strlen($code) : strlen($code)) ], $logUnit);
+        $this->debugLog(fn () => [
+            'Encoding value' => [
+                'type'   => ($type = gettype($value)) === 'object' ? get_class($value) : $type,
+                'length' => (function_exists('mb_strlen') ? mb_strlen($code) : strlen($code))
+            ]
+        ], $logUnit);
 
         return $code;
     }
@@ -73,7 +82,7 @@ abstract class Codec implements ICodec {
      * @final
      * @override
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param string $code
      * @return mixed
@@ -82,12 +91,21 @@ abstract class Codec implements ICodec {
 
         $logUnit = static::class . '::' . __FUNCTION__;
 
-        $this->debugLog('pre-decode', [ 'length' => (function_exists('mb_strlen') ? mb_strlen($code) : strlen($code)) ], $logUnit);
+        $this->infoLog(fn() => [
+            'Decoding value' => [
+                'length' => (function_exists('mb_strlen') ? mb_strlen($code) : strlen($code))
+            ]
+        ], $logUnit);
 
         /** @var mixed $value */
         $value = $this->doDecode($code);
 
-        $this->debugLog('post-decode', [ 'type' => ($type = gettype($value)) === 'object' ? get_class($value) : $type ], $logUnit);
+        $this->debugLog(fn() => [
+            'Decoding value' => [
+                'length' => (function_exists('mb_strlen') ? mb_strlen($code) : strlen($code)),
+                'type'   => ($type = gettype($value)) === 'object' ? get_class($value) : $type
+            ]
+        ], $logUnit);
 
         return $value;
     }

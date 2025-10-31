@@ -10,7 +10,7 @@ use Logger\Logger;
  * @api
  * @final
  * @since 1.0.0
- * @version 1.1.0
+ * @version 1.2.0
  * @package codecs
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
@@ -19,12 +19,12 @@ final class CompoundCodec extends Codec {
     /**
      * The codecs that make up this compound codec.
      * 
-     * @api
+     * @internal
      * @since 1.0.0
      * 
      * @var array<ICodec>
      */
-    public readonly array $codecs;
+    private array $codecs;
 
     /**
      * Creates a new instance of the compound codec.
@@ -68,12 +68,16 @@ final class CompoundCodec extends Codec {
      * @api
      * @final
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.2.0
      * 
      * @param ICodec $codec
      * @return CompoundCodec This instance for method chaining.
      */
     public final function append(ICodec $codec): static {
+
+        $this->infoLog(fn() => [
+            'Appending codec' => [ 'type' => $codec::class, 'id' => spl_object_id($codec) ]
+        ], static::class . '::' . __FUNCTION__);
 
         array_push($this->codecs, $codec);
 
@@ -88,12 +92,16 @@ final class CompoundCodec extends Codec {
      * @api
      * @final
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.2.0
      * 
      * @param ICodec $codec
      * @return CompoundCodec This instance for method chaining.
      */
     public final function prepend(ICodec $codec): static {
+
+        $this->infoLog(fn() => [
+            'Prepending codec' => [ 'type' => $codec::class, 'id' => spl_object_id($codec) ]
+        ], static::class . '::' . __FUNCTION__);
 
         array_unshift($this->codecs, $codec);
 
